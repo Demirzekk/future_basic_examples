@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+import 'package:future_basic_examples/extension/extensions.dart';
+import 'package:future_basic_examples/model/user_model.dart';
+
+const String userAvatar = "https://picsum.photos/800";
+const String errorImage =
+    "https://www.shutterstock.com/image-vector/caution-exclamation-mark-white-red-260nw-1055269061.jpg";
+const String loadingImage =
+    "https://media.istockphoto.com/id/1302436594/video/loading-circle-icon-animation-on-white-background-4k-video-loopable-preloader.jpg?s=640x640&k=20&c=JQzv8UsXNfUnqQSULYW8B858UOM2O5CoXRgG9a0hRFk=";
+
+class FutureExample3 extends StatefulWidget {
+  const FutureExample3({super.key});
+
+  @override
+  State<FutureExample3> createState() => _FutureExample3State();
+}
+
+class _FutureExample3State extends State<FutureExample3> {
+  UserModel userModel = UserModel();
+
+  Future init(bool isTimeOut) async {
+    setState(() {
+      userModel = UserModel(status: StatusEnum.waiting);
+    });
+
+    await Future.delayed(const Duration(seconds: 5));
+
+    if (isTimeOut) {
+      userModel = UserModel(status: StatusEnum.failure);
+      return await Future.error(userModel);
+    }
+    setState(() {
+      userModel = UserModel(
+          status: StatusEnum.success,
+          name: "Sezgin",
+          surname: "Altay",
+          city: "Ankara",
+          userAvatar: userAvatar);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Future Example 3")),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            width: size.width,
+            padding: const EdgeInsets.all(32),
+            alignment: Alignment.center,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text("User Information"),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: NetworkImage(
+                      userModel.status?.statusToImageUrl(),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    "Durum: ${userModel.status?.translateStatusEnum()}",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  if (userModel.status == StatusEnum.success)
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "İsim: ${userModel.name}",
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "Soyisim: ${userModel.surname}",
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "Kütük: ${userModel.city}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    )
+                ]),
+          ),
+          Center(
+            child: SizedBox(
+              width: 250,
+              child: ElevatedButton.icon(
+                  onPressed: () async {
+                    await init(false).whenComplete(() => setState(() {}));
+                  },
+                  icon: userModel.status == StatusEnum.waiting
+                      ? const LoadingWidget()
+                      : const Icon(Icons.start),
+                  label: const Text("Kullanıcı verisini çek!")),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class LoadingWidget extends StatelessWidget {
+  const LoadingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 20,
+      width: 20,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+        ),
+      ),
+    );
+  }
+}
