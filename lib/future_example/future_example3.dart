@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:future_basic_examples/extension/extensions.dart';
 import 'package:future_basic_examples/model/user_model.dart';
@@ -18,30 +20,33 @@ class FutureExample3 extends StatefulWidget {
 class _FutureExample3State extends State<FutureExample3> {
   UserModel userModel = UserModel();
 
-  Future init(bool isTimeOut) async {
+  Future init() async {
     setState(() {
-      userModel = UserModel(status: StatusEnum.waiting);
+      userModel = userModel.copyWith(
+          name: "Ahmet",
+          surname: "Yıldız",
+          status: StatusEnum.waiting,
+          backgroundImage:
+              "https://media.istockphoto.com/id/1665715032/photo/banff-and-rundle-mountian.webp?b=1&s=170667a&w=0&k=20&c=W37mEih_AdOt_5HJLjGa7RIeq_DYpYxKahsvMlg5CDU=");
     });
 
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 2));
 
-    if (isTimeOut) {
-      userModel = UserModel(status: StatusEnum.failure);
+    if (userModel.istimeOut.enableTimeout() == StatusEnum.timeOut) {
+      userModel =
+          userModel.copyWith(status: userModel.istimeOut.enableTimeout());
       return await Future.error(userModel);
     }
     setState(() {
-      userModel = UserModel(
-          status: StatusEnum.success,
-          name: "Sezgin",
-          surname: "Altay",
-          city: "Ankara",
-          userAvatar: userAvatar);
+      userModel = userModel.copyWith(
+          status: StatusEnum.success, name: "Mehmet", city: "Kırklareli");
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Future Example 3")),
@@ -57,14 +62,38 @@ class _FutureExample3State extends State<FutureExample3> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text("User Information"),
+                  Text(
+                    "User Information",
+                    style: theme.titleLarge?.copyWith(
+                        color: Colors.red, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(
                     height: 12,
                   ),
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(
-                      userModel.status?.statusToImageUrl(),
+                  SizedBox(
+                    height: 150,
+                    width: double.maxFinite,
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          userModel.backgroundImage ?? "",
+                          width: double.maxFinite,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: NetworkImage(
+                                userModel.status?.statusToImageUrl(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(
@@ -103,7 +132,10 @@ class _FutureExample3State extends State<FutureExample3> {
               width: 250,
               child: ElevatedButton.icon(
                   onPressed: () async {
-                    await init(false).whenComplete(() => setState(() {}));
+                    setState(() {
+                      userModel = userModel.copyWith(istimeOut: true);
+                    });
+                    await init().whenComplete(() => setState(() {}));
                   },
                   icon: userModel.status == StatusEnum.waiting
                       ? const LoadingWidget()
@@ -133,3 +165,10 @@ class LoadingWidget extends StatelessWidget {
     );
   }
 }
+
+
+// Haber uygulaması
+// Quiz uygulaması
+// Todo uygulaması *belki
+// İngilizce Kelime ezberleme uygulaması
+

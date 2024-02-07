@@ -7,7 +7,7 @@ const String loadingImage =
 const String image =
     "https://cdn1.vectorstock.com/i/1000x1000/50/20/no-photo-or-blank-image-icon-loading-images-vector-37375020.jpg";
 
-enum StatusEnum { idle, waiting, success, failure }
+enum StatusEnum { idle, waiting, success, failure, timeOut }
 
 extension StatusEnumX on StatusEnum {
   translateStatusEnum() {
@@ -20,7 +20,8 @@ extension StatusEnumX on StatusEnum {
         return "Bağlandı";
       case StatusEnum.failure:
         return "Bir hata meydana geldi";
-
+      case StatusEnum.timeOut:
+        return "İşlem zaman aşımı";
       default:
         return "Null Status";
     }
@@ -41,6 +42,20 @@ extension StatusImageX on StatusEnum {
 
       default:
         return image;
+    }
+  }
+}
+
+extension EnableTimeOutX on bool? {
+  enableTimeout() {
+    switch (this) {
+      case true:
+        return StatusEnum.timeOut;
+      case false:
+        return StatusEnum.success;
+
+      default:
+        return StatusEnum.idle;
     }
   }
 }
