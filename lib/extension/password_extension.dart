@@ -14,4 +14,3 @@ extension PasswordEnumX on PassStatusEnum {
     }
   }
 }
-

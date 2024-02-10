@@ -38,8 +38,8 @@ class _PassWordPageState extends State<PassWordPage> {
                 child: SizedBox(
                     height: 30,
                     width: 30,
-                    child:
-                        LottieBuilder.asset("assets/lottie/loading.json")))));
+                    child: LottieBuilder.asset(
+                        AssetsImageEnum.loading.loadingAssets())))));
 
     setState(() {});
   }
@@ -59,8 +59,14 @@ class _PassWordPageState extends State<PassWordPage> {
                 children: [
                   CustomTextFieldPass(
                     controller: userNameController,
-                    hintText: "mustafacimen",
-                    title: "Kullanıcı Adı",
+                    hintText: Key.userNameExample.translate(),
+                    title: Key.userNameWord.translate(),
+                    textValidator: (titleVal) {
+                      if (titleVal?.isEmpty == true) {
+                        return "uyarı \n Kullanıcı adı Boş Bırakılamaz";
+                      }
+                      return null;
+                    },
                   ),
                   CustomTextFieldPass(
                     textValidator: (passVal) {
@@ -68,13 +74,13 @@ class _PassWordPageState extends State<PassWordPage> {
                           passVal?.isEmpty == true ||
                           passVal?.contains(RegExp(r'^[a-zA-Z0-9]+$')) ==
                               true) {
-                        return "uyarı: en az bir büyük ve küçük harf bulunmalı, en az bir özel karakter, en az bir rakam bulunmalı";
+                        return "uyarı \n en az bir büyük ve küçük harf bulunmalı,  \n en az bir özel karakter bulunmalı , \n en az bir rakam bulunmalı";
                       }
                       return null;
                     },
                     controller: passWordController,
-                    hintText: "ör  istanBul.2024",
-                    title: "Şifre",
+                    hintText: Key.passWordExample.translate(),
+                    title: Key.passWordKey.translate(),
                   ),
                 ],
               )),
@@ -82,7 +88,7 @@ class _PassWordPageState extends State<PassWordPage> {
               onPressed: () {
                 init();
               },
-              child: const Text("kaydet"))
+              child: Text(Key.save.translate())),
         ],
       ),
     );
@@ -126,5 +132,35 @@ class CustomTextFieldPass extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+enum Key { userNameExample, userNameWord, passWordExample, passWordKey, save }
+
+extension BasicWordX on Key {
+  String translate() {
+    switch (this) {
+      case Key.userNameExample:
+        return "mustafacimen";
+      case Key.userNameWord:
+        return "Kullanıcı Adı";
+
+      case Key.passWordExample:
+        return "istanB.8";
+      case Key.passWordKey:
+        return " şifre";
+      case Key.save:
+        return "kaydet";
+      default:
+        return "veri yok ";
+    }
+  }
+}
+
+enum AssetsImageEnum { loading }
+
+extension AssetsX on AssetsImageEnum {
+  String loadingAssets() {
+    return "assets/lottie/$name.json";
   }
 }
