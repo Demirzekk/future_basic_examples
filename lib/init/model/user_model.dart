@@ -1,4 +1,6 @@
-import 'package:future_basic_examples/extension/extensions.dart';
+ 
+
+import '../extension/extensions.dart';
 
 const String userPicture = "https://picsum.photos/1200";
 

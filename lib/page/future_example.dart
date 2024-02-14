@@ -1,14 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
- 
 import 'package:flutter/material.dart';
-import 'package:future_basic_examples/future_example/profile.dart';
+import 'package:future_basic_examples/page/profile_page/profile.dart';
 
-import 'custom_widget/custom_container.dart';
-import 'custom_widget/custom_floating_button.dart';
-
- 
+import '../init/custom_widgets/custom_container.dart';
+import '../init/custom_widgets/custom_floating_button.dart';
 
 class FutureExamplePage extends StatefulWidget {
   const FutureExamplePage({super.key});
@@ -67,15 +64,11 @@ class _FutureExamplePageState extends State<FutureExamplePage>
     );
   }
 
-  
-
   startTimer() {
     setState(() {
       paused = !paused;
     });
   }
-
- 
 
   @override
   void dispose() {

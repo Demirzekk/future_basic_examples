@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:future_basic_examples/page/profile_page/profile_model.dart';
+import 'package:future_basic_examples/page/profile_page/profile_model_view.dart';
 
 class ProfileDart extends StatefulWidget {
   const ProfileDart({super.key});
@@ -8,6 +10,18 @@ class ProfileDart extends StatefulWidget {
 }
 
 class _ProfileDartState extends State<ProfileDart> {
+  final ProfileModelView _profileModelView = ProfileModelView();
+  ProfileModel? _model;
+  @override
+  void initState() {
+    initProfile();
+    super.initState();
+  }
+
+  initProfile() async {
+    _model = await _profileModelView.setProfileModelData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +37,7 @@ class _ProfileDartState extends State<ProfileDart> {
                 height: 20,
               ),
               Text(
-                "Zamanlama takvimi",
+                _model?.profileTitle ?? "null",
                 style: Theme.of(context)
                     .textTheme
                     .headlineSmall
@@ -84,3 +98,15 @@ class _SingleChoiceState extends State<SingleChoice> {
     );
   }
 }
+
+
+// MVVM
+// model 
+// View
+// ViewModel
+
+// MVC
+
+// model
+// view
+// controller

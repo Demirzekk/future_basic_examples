@@ -1,14 +1,12 @@
+// ignore_for_file: unused_import
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:future_basic_examples/extension/extensions.dart';
-import 'package:future_basic_examples/model/user_model.dart';
 
-const String userAvatar = "https://picsum.photos/800";
-const String errorImage =
-    "https://www.shutterstock.com/image-vector/caution-exclamation-mark-white-red-260nw-1055269061.jpg";
-const String loadingImage =
-    "https://media.istockphoto.com/id/1302436594/video/loading-circle-icon-animation-on-white-background-4k-video-loopable-preloader.jpg?s=640x640&k=20&c=JQzv8UsXNfUnqQSULYW8B858UOM2O5CoXRgG9a0hRFk=";
+import '../init/constants/url_constants.dart';
+import '../init/extension/extensions.dart';
+import '../init/model/user_model.dart';
 
 class FutureExample3 extends StatefulWidget {
   const FutureExample3({super.key});
@@ -26,8 +24,7 @@ class _FutureExample3State extends State<FutureExample3> {
           name: "Ahmet",
           surname: "Yıldız",
           status: StatusEnum.waiting,
-          backgroundImage:
-              "https://media.istockphoto.com/id/1665715032/photo/banff-and-rundle-mountian.webp?b=1&s=170667a&w=0&k=20&c=W37mEih_AdOt_5HJLjGa7RIeq_DYpYxKahsvMlg5CDU=");
+          backgroundImage: UrlConstants.backgroundImageUrl);
     });
 
     await Future.delayed(const Duration(seconds: 2));

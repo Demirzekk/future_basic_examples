@@ -1,6 +1,8 @@
 
 //
-import 'package:future_basic_examples/extension/password_extension.dart';
+ 
+
+import '../extension/password_extension.dart';
 
 class PassWordModel {
   PassStatusEnum? status;
