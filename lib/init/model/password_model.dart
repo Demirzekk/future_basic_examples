@@ -1,8 +1,9 @@
 
-//
+
  
 
-import '../extension/password_extension.dart';
+
+import '../enum/app_enum.dart';
 
 class PassWordModel {
   PassStatusEnum? status;
