@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:future_basic_examples/init/extension/extensions.dart';
 
-import '../init/extension/password_extension.dart';
+import '../init/custom_widgets/custom_text_field_pass.dart';
+import '../init/enum/app_enum.dart';
+
 import '../init/model/password_model.dart';
-import '../init/validator/validator.dart';
 
 class PassWordPage extends StatefulWidget {
   const PassWordPage({super.key});
@@ -17,6 +19,11 @@ class _PassWordPageState extends State<PassWordPage> {
   PassWordModel passModel = PassWordModel();
   GlobalKey<FormState> formKey = GlobalKey();
   List<PassStatusEnum?> passStatusList = [];
+  List<UserNameStatusEnum?> userNameStatusList = [];
+  @override
+  void initState() {
+    super.initState();
+  }
   // Future init() async {
   //   setState(() {});
   //   passModel.status = PassStatusEnum.idle;
@@ -65,11 +72,13 @@ class _PassWordPageState extends State<PassWordPage> {
                     hintText: Key.userNameExample.translate(),
                     title: Key.userNameWord.translate(),
                     textValidator: (userName) {
-                      CustomValidator validator = CustomValidator();
-                      if (validator.isValEmptyOrNull(userName)) {
-                        return "uyarı \n Kullanıcı adı Boş Bırakılamaz";
+                      setState(() {
+                        userNameStatusList = userName.userNameValid();
+                      });
+                      if (userNameStatusList.isEmpty) {
+                        return null;
                       }
-                      return null;
+                      return userNameStatusList.first?.userNameStatusInfo();
                     },
                   ),
                   CustomTextFieldPass(
@@ -112,46 +121,7 @@ class _PassWordPageState extends State<PassWordPage> {
   }
 }
 
-class CustomTextFieldPass extends StatelessWidget {
-  const CustomTextFieldPass(
-      {super.key,
-      required this.controller,
-      required this.hintText,
-      required this.title,
-      this.textValidator});
-  final TextEditingController controller;
-  final String hintText;
-  final String title;
-  final String? Function(String?)? textValidator;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            title,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: TextFormField(
-            validator: textValidator,
-            decoration: InputDecoration(
-                hintText: hintText,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30))),
-            controller: controller,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
+// TODO taşınamadı
 enum Key { userNameExample, userNameWord, passWordExample, passWordKey, save }
 
 extension BasicWordX on Key {
@@ -171,13 +141,5 @@ extension BasicWordX on Key {
       default:
         return "veri yok ";
     }
-  }
-}
-
-enum AssetsImageEnum { loading }
-
-extension AssetsX on AssetsImageEnum {
-  String loadingAssets() {
-    return "assets/lottie/$name.json";
   }
 }

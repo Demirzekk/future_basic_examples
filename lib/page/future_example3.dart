@@ -24,7 +24,7 @@ class _FutureExample3State extends State<FutureExample3> {
           name: "Ahmet",
           surname: "Yıldız",
           status: StatusEnum.waiting,
-          backgroundImage: UrlConstants.backgroundImageUrl);
+          backgroundImage: UrlConstants().backgroundImageUrl);
     });
 
     await Future.delayed(const Duration(seconds: 2));
