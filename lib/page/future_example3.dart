@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import '../init/constants/url_constants.dart';
+import '../init/enum/app_enum.dart';
 import '../init/extension/extensions.dart';
 import '../init/model/user_model.dart';
 

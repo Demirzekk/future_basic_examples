@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:future_basic_examples/init/extension/extensions.dart';
 
+import '../init/constants/app_data.dart';
 import '../init/custom_widgets/custom_text_field_pass.dart';
 import '../init/enum/app_enum.dart';
 
@@ -24,41 +25,10 @@ class _PassWordPageState extends State<PassWordPage> {
   void initState() {
     super.initState();
   }
-  // Future init() async {
-  //   setState(() {});
-  //   passModel.status = PassStatusEnum.idle;
-  //   final formQuery = formKey.currentState;
-  //   if (formQuery?.validate() == false) {
-  //     return passModel.status = PassStatusEnum.invalid;
-  //   }
-
-  //   passModel = PassWordModel(
-  //       password: passWordController.text, userName: userNameController.text);
-  //   passModel.status = PassStatusEnum.valid;
-
-  //   showDialog(
-  //       context: context,
-  //       builder: (_) => AlertDialog(
-  //           title: Text(passModel.status?.passAboutInfo()),
-  //           content: SizedBox(
-  //               height: 100,
-  //               width: 100,
-  //               child: SizedBox(
-  //                   height: 30,
-  //                   width: 30,
-  //                   child: LottieBuilder.asset(
-  //                       AssetsImageEnum.loading.loadingAssets())))));
-
-  //   setState(() {});
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          // title: Text(
-          //     "şifre belirleyin ${passModel.status == null ? "" : passModel.status?.passAboutInfo()}"),
-          ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -69,8 +39,10 @@ class _PassWordPageState extends State<PassWordPage> {
                 children: [
                   CustomTextFieldPass(
                     controller: userNameController,
-                    hintText: Key.userNameExample.translate(),
-                    title: Key.userNameWord.translate(),
+                    hintText:
+                        validationKey.translate(ValidationKey.userNameWord),
+                    title:
+                        validationKey.translate(ValidationKey.userNameExample),
                     textValidator: (userName) {
                       setState(() {
                         userNameStatusList = userName.userNameValid();
@@ -93,8 +65,9 @@ class _PassWordPageState extends State<PassWordPage> {
                       return passStatusList.first?.passStatusToDesc();
                     },
                     controller: passWordController,
-                    hintText: Key.passWordExample.translate(),
-                    title: Key.passWordKey.translate(),
+                    hintText:
+                        validationKey.translate(ValidationKey.passWordExample),
+                    title: validationKey.translate(ValidationKey.passWordKey),
                   ),
                 ],
               )),
@@ -114,32 +87,9 @@ class _PassWordPageState extends State<PassWordPage> {
                   return;
                 }
               },
-              child: Text(Key.save.translate())),
+              child: Text(validationKey.translate(ValidationKey.save))),
         ],
       ),
     );
-  }
-}
-
-// TODO taşınamadı
-enum Key { userNameExample, userNameWord, passWordExample, passWordKey, save }
-
-extension BasicWordX on Key {
-  String translate() {
-    switch (this) {
-      case Key.userNameExample:
-        return "mustafacimen";
-      case Key.userNameWord:
-        return "Kullanıcı Adı Belirleyin";
-
-      case Key.passWordExample:
-        return "istanB.8";
-      case Key.passWordKey:
-        return "Şifre belirleyin!";
-      case Key.save:
-        return "kaydet";
-      default:
-        return "veri yok ";
-    }
   }
 }

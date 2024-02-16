@@ -7,7 +7,12 @@ import '../validator/validator.dart';
 
 UrlConstants urlconst = UrlConstants();
 
-enum StatusEnum { idle, waiting, success, failure, timeOut }
+extension BasicWordX on Map<ValidationKey, dynamic>? {
+  // mapin keyine göre value dönderir. Map içerisinde key yoksa null değer dönderir
+  String translate(val) {
+    return this?[val] ?? "null";
+  }
+}
 
 extension StatusEnumX on StatusEnum {
   translateStatusEnum() {
@@ -88,13 +93,9 @@ extension UserNameEnumX on String? {
       userNameValidList.add(UserNameStatusEnum.userNameBetweenSpace);
     }
 
-    /// ??????///////////// ⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️
-
     if (validatorUserName.startNumericalChar(this) == true) {
-      userNameValidList.add(UserNameStatusEnum.maybeContainNum);
+      userNameValidList.add(UserNameStatusEnum.isStartWithNum);
     }
-
-    //// ?????????????//////⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️
 
     if (validatorUserName.hasMinSpecialChar(this)) {
       userNameValidList.add(UserNameStatusEnum.userNameNotSpecialChar);
@@ -120,8 +121,8 @@ extension UserNameStatusEnumX on UserNameStatusEnum {
 
       case UserNameStatusEnum.userNameBetweenSpace:
         return "Karakterler arası boşluk olamaz!";
-      case UserNameStatusEnum.maybeContainNum:
-        return "Kullanıcı adının başında rakam olamaz";
+      case UserNameStatusEnum.isStartWithNum:
+        return "Kullanıcı adının rakamla başlayamaz!";
 
       default:
         return "Şifrenizi kurallara uygun oluşturun!";
