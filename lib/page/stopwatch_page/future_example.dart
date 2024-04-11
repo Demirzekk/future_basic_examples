@@ -1,11 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:future_basic_examples/page/profile_page/profile.dart';
+import 'package:future_basic_examples/init/cache_data/shared_data.dart';
+import 'package:future_basic_examples/page/stopwatch_page/timer_history.dart';
 
-import '../init/custom_widgets/custom_container.dart';
-import '../init/custom_widgets/custom_floating_button.dart';
+import '../../init/custom_widgets/custom_container.dart';
+import '../../init/custom_widgets/custom_floating_button.dart';
 
 class FutureExamplePage extends StatefulWidget {
   const FutureExamplePage({super.key});
@@ -16,8 +18,35 @@ class FutureExamplePage extends StatefulWidget {
 
 class _FutureExamplePageState extends State<FutureExamplePage>
     with SingleTickerProviderStateMixin {
+  SharedPreferancesTimedata sharedtime = SharedPreferancesTimedata();
+
+  init() async {
+    setState(() {});
+    await getTime();
+  }
+
+  setTime() async {
+    List<String> res = saveTimeList.map((e) => jsonEncode(e)).toList();
+
+    await sharedtime.getModelData(res);
+  }
+
+  
+
+  getTime() async {
+    List<String?>? res = await sharedtime.getUserListData();
+
+    saveTimeList = res
+            ?.map((e) => TotalTimeModel.fromJson(jsonDecode(e ?? "")))
+            .toList() ??
+        [];
+
+    setState(() {});
+  }
+
   TotalTimeModel? model;
-  List<TotalTimeModel> totalList = [];
+
+  List<TotalTimeModel> saveTimeList = [];
   bool paused = false;
   bool tek = false;
 
@@ -31,8 +60,6 @@ class _FutureExamplePageState extends State<FutureExamplePage>
   @override
   void initState() {
     super.initState();
-//second= pref.getLastTime();
-    second = 20;
 
     controller = AnimationController(
       vsync: this,
@@ -45,7 +72,7 @@ class _FutureExamplePageState extends State<FutureExamplePage>
     // timer start
 
     _timer = Timer.periodic(
-      const Duration(seconds: 1),
+      const Duration(milliseconds: 20),
       (timer) {
         if (paused == false) {
           setState(() {
@@ -62,6 +89,7 @@ class _FutureExamplePageState extends State<FutureExamplePage>
         }
       },
     );
+    init();
   }
 
   startTimer() {
@@ -73,6 +101,7 @@ class _FutureExamplePageState extends State<FutureExamplePage>
   @override
   void dispose() {
     _timer?.cancel();
+    
     super.dispose();
   }
 
@@ -93,7 +122,9 @@ class _FutureExamplePageState extends State<FutureExamplePage>
               minute = 0;
               second = 0;
               hour = 0;
-              totalList.clear();
+              saveTimeList.clear();
+
+              setTime();
               setState(() {});
             },
           ),
@@ -103,8 +134,10 @@ class _FutureExamplePageState extends State<FutureExamplePage>
           CustomFloatingActionButton(
             buttonName: "tur",
             timerFunction: () {
-              totalList.add(TotalTimeModel(
+              saveTimeList.add(TotalTimeModel(
                   totalsecond: second, totalminute: minute, totalhour: hour));
+          
+              setTime();
               setState(() {});
             },
           ),
@@ -183,7 +216,7 @@ class _FutureExamplePageState extends State<FutureExamplePage>
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    ...List.generate(totalList.length, (index) {
+                    ...List.generate(saveTimeList.length, (index) {
                       return Column(
                         children: [
                           Padding(
@@ -192,7 +225,7 @@ class _FutureExamplePageState extends State<FutureExamplePage>
                             child: ListTile(
                               leading: Text((index + 1).toString()),
                               title: Text(
-                                  " ${totalList[index].totalhour.toString()}  :   ${totalList[index].totalminute.toString()} , ${totalList[index].totalsecond.toString()}"),
+                                  " ${saveTimeList[index].totalhour.toString()}  :   ${saveTimeList[index].totalminute.toString()} , ${saveTimeList[index].totalsecond.toString()}"),
                             ),
                           ),
                           Divider(
@@ -223,10 +256,36 @@ class TotalTimeModel {
   int? totalsecond;
   int? totalminute;
   int? totalhour;
+  List<TotalTimeModel>? totaltime;
   TotalTimeModel(
       {required this.totalsecond,
+      this.totaltime,
       required this.totalminute,
       required this.totalhour});
+  TotalTimeModel.fromJson(Map<String, dynamic> json) {
+    totalsecond = json["totalsecond"];
+    totalminute = json["totalminute"];
+    totalhour = json["totalhour"];
+    if (json["news"] != null) {
+      totaltime = <TotalTimeModel>[];
+      json["news"].forEach((dynamic v) {
+        totaltime?.add(TotalTimeModel.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> json = <String, dynamic>{};
+
+    json["totalsecond"] = totalsecond;
+    json["totalminute"] = totalminute;
+    json["totalhour"] = totalhour;
+    if (totaltime != null) {
+      json["news"] = totaltime?.map((v) => v.toJson()).toList();
+    }
+
+    return json;
+  }
 }
 
 
@@ -236,4 +295,5 @@ class TotalTimeModel {
 // Birden fazla yapılan işlemlerde, bu işlemler arasında iş parcacığının tamamlanması diğer işlemlerden farklı
 // ise burada async function kullanılır. Yada kısa süre içerisinde gerçekleşmeyen
 // zamana ihtiyac duyan işlemlerde yine async functionlar kullanılır
+
 
