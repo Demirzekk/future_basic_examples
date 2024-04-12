@@ -12,7 +12,7 @@ class TimerViewModel {
     List<HistoryModel> historyModelList = [];
     List<String> total = historyModelList.map((e) => jsonEncode(e)).toList();
 
-    await savedTimerData.getModelData(total);
+    await savedTimerData.setModelData(total);
     return historyModelList = await getTime();
   }
 

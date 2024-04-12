@@ -7,7 +7,7 @@ class SharedPreferancesTimedata {
     return prefs;
   }
 
-  Future<bool> getModelData(List<String> value) async {
+  Future<bool> setModelData(List<String> value) async {
     final prefs = await initShared();
     return prefs.setStringList(stopWatchData, value);
   }
