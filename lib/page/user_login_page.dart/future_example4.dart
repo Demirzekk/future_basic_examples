@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:future_basic_examples/init/extension/extensions.dart';
 
-import '../init/constants/app_data.dart';
-import '../init/custom_widgets/custom_text_field_pass.dart';
-import '../init/enum/app_enum.dart';
+import '../../init/constants/app_data.dart';
+import '../../init/custom_widgets/custom_text_field_pass.dart';
+import '../../init/enum/app_enum.dart';
 
-import '../init/model/password_model.dart';
+import '../../init/model/password_model.dart';
 
 class PassWordPage extends StatefulWidget {
   const PassWordPage({super.key});
@@ -77,7 +77,7 @@ class _PassWordPageState extends State<PassWordPage> {
               child: Text(
                 "Oluşturulan şifre geçerli!",
                 style:
-                    TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+                    TextStyle(color: Color.fromARGB(255, 3, 5, 3), fontWeight: FontWeight.w600),
               ),
             ),
           ElevatedButton(
