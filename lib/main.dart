@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:future_basic_examples/page/stopwatch_page/future_example.dart';
+import 'package:future_basic_examples/page/chronometer/chronometer_page/chronometer_page.dart';
+import 'package:future_basic_examples/page/chronometer/timer_history_list_page/timer_history.dart';
 
 import 'package:future_basic_examples/page/user_login_page.dart/future_example4.dart';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const FutureExamplePage(),
+      home: const TimerHistoryPage(),
     );
   }
 }

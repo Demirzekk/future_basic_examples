@@ -1,15 +1,14 @@
 import 'package:shared_preferences/shared_preferences.dart';
- 
 
 class SharedPreferancesTimedata {
-  static const  stopWatchData = "stopWatch";
+  static const stopWatchData = "savedTimer";
   Future<SharedPreferences> initShared() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs;
   }
 
- Future<bool> getModelData(List<String> value) async {
-    final prefs = await  initShared();
+  Future<bool> getModelData(List<String> value) async {
+    final prefs = await initShared();
     return prefs.setStringList(stopWatchData, value);
   }
 

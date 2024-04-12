@@ -3,51 +3,28 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:future_basic_examples/init/cache_data/shared_data.dart';
-import 'package:future_basic_examples/page/stopwatch_page/timer_history.dart';
 
-import '../../init/custom_widgets/custom_container.dart';
-import '../../init/custom_widgets/custom_floating_button.dart';
+import '../../../init/custom_widgets/custom_container.dart';
+import '../../../init/custom_widgets/custom_floating_button.dart';
+import '../timer_history_list_page/model/timer_history_model.dart';
+import '../timer_history_list_page/model/total_timer_model.dart';
+import 'chronometer_model_view.dart';
 
-class FutureExamplePage extends StatefulWidget {
-  const FutureExamplePage({super.key});
-
+class ChronometerPage extends StatefulWidget {
+  const ChronometerPage({super.key, this.historyModel});
+  final HistoryModel? historyModel;
   @override
-  State<FutureExamplePage> createState() => _FutureExamplePageState();
+  State<ChronometerPage> createState() => _ChronometerPageState();
 }
 
-class _FutureExamplePageState extends State<FutureExamplePage>
+class _ChronometerPageState extends State<ChronometerPage>
     with SingleTickerProviderStateMixin {
-  SharedPreferancesTimedata sharedtime = SharedPreferancesTimedata();
-
-  init() async {
-    setState(() {});
-    await getTime();
-  }
-
-  setTime() async {
-    List<String> res = saveTimeList.map((e) => jsonEncode(e)).toList();
-
-    await sharedtime.getModelData(res);
-  }
-
-  
-
-  getTime() async {
-    List<String?>? res = await sharedtime.getUserListData();
-
-    saveTimeList = res
-            ?.map((e) => TotalTimeModel.fromJson(jsonDecode(e ?? "")))
-            .toList() ??
-        [];
-
-    setState(() {});
-  }
-
   TotalTimeModel? model;
 
   List<TotalTimeModel> saveTimeList = [];
-  bool paused = false;
+  bool paused = true;
   bool tek = false;
 
   Timer? _timer;
@@ -60,7 +37,7 @@ class _FutureExamplePageState extends State<FutureExamplePage>
   @override
   void initState() {
     super.initState();
-
+    saveTimeList = widget.historyModel?.totalTimeModel ?? [];
     controller = AnimationController(
       vsync: this,
       reverseDuration: const Duration(milliseconds: 200),
@@ -69,10 +46,8 @@ class _FutureExamplePageState extends State<FutureExamplePage>
 
     animation = Tween<double>(begin: 0.0, end: 1.0).animate(controller);
 
-    // timer start
-
     _timer = Timer.periodic(
-      const Duration(milliseconds: 20),
+      const Duration(milliseconds: 1000),
       (timer) {
         if (paused == false) {
           setState(() {
@@ -89,7 +64,6 @@ class _FutureExamplePageState extends State<FutureExamplePage>
         }
       },
     );
-    init();
   }
 
   startTimer() {
@@ -101,47 +75,36 @@ class _FutureExamplePageState extends State<FutureExamplePage>
   @override
   void dispose() {
     _timer?.cancel();
-    
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: const ProfileDart(),
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Zamanlayıcı"),
+        title: const Text("Kronometre"),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CustomFloatingActionButton(
-            buttonName: "sıfırla",
-            timerFunction: () {
-              minute = 0;
-              second = 0;
-              hour = 0;
-              saveTimeList.clear();
-
-              setTime();
-              setState(() {});
-            },
-          ),
-          const SizedBox(
-            width: 200,
-          ),
-          CustomFloatingActionButton(
-            buttonName: "tur",
-            timerFunction: () {
-              saveTimeList.add(TotalTimeModel(
-                  totalsecond: second, totalminute: minute, totalhour: hour));
-          
-              setTime();
-              setState(() {});
-            },
-          ),
-        ],
+      floatingActionButton: CustomFloatingActionButton(
+        buttonName: "Kaydet",
+        timerFunction: () async {
+          saveTimeList.add(TotalTimeModel(
+              totalsecond: second, totalminute: minute, totalhour: hour));
+          final historyModel = widget.historyModel != null
+              ? widget.historyModel?.copyWith(
+                  id: widget.historyModel?.id,
+                  day: widget.historyModel?.day,
+                  totalTimeModel: saveTimeList)
+              : HistoryModel(
+                  id: 1,
+                  day: DateTime.now().toString(),
+                  totalTimeModel: saveTimeList);
+          if (historyModel != null) {
+            await TimerViewModel().setTime(historyModel);
+          }
+          setState(() {});
+        },
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -251,49 +214,3 @@ class _FutureExamplePageState extends State<FutureExamplePage>
     );
   }
 }
-
-class TotalTimeModel {
-  int? totalsecond;
-  int? totalminute;
-  int? totalhour;
-  List<TotalTimeModel>? totaltime;
-  TotalTimeModel(
-      {required this.totalsecond,
-      this.totaltime,
-      required this.totalminute,
-      required this.totalhour});
-  TotalTimeModel.fromJson(Map<String, dynamic> json) {
-    totalsecond = json["totalsecond"];
-    totalminute = json["totalminute"];
-    totalhour = json["totalhour"];
-    if (json["news"] != null) {
-      totaltime = <TotalTimeModel>[];
-      json["news"].forEach((dynamic v) {
-        totaltime?.add(TotalTimeModel.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> json = <String, dynamic>{};
-
-    json["totalsecond"] = totalsecond;
-    json["totalminute"] = totalminute;
-    json["totalhour"] = totalhour;
-    if (totaltime != null) {
-      json["news"] = totaltime?.map((v) => v.toJson()).toList();
-    }
-
-    return json;
-  }
-}
-
-
-
-
-//async functions
-// Birden fazla yapılan işlemlerde, bu işlemler arasında iş parcacığının tamamlanması diğer işlemlerden farklı
-// ise burada async function kullanılır. Yada kısa süre içerisinde gerçekleşmeyen
-// zamana ihtiyac duyan işlemlerde yine async functionlar kullanılır
-
-
