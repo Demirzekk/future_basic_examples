@@ -1,31 +1,33 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
-import 'package:future_basic_examples/init/cache_data/shared_data.dart';
+import 'package:future_basic_examples/page/chronometer/timer_history_list_page/model/timer_history_model.dart';
+import 'package:future_basic_examples/page/chronometer/timer_history_list_page/timer_history.dart';
 
 import '../../../init/custom_widgets/custom_container.dart';
 import '../../../init/custom_widgets/custom_floating_button.dart';
-import '../timer_history_list_page/model/timer_history_model.dart';
+
 import '../timer_history_list_page/model/total_timer_model.dart';
 import 'chronometer_model_view.dart';
 
 class ChronometerPage extends StatefulWidget {
-  const ChronometerPage({super.key, this.historyModel});
-  final HistoryModel? historyModel;
+  const ChronometerPage({super.key, required this.pasthistoryList, required this.isPast});
+
   @override
   State<ChronometerPage> createState() => _ChronometerPageState();
+  final HistoryModel pasthistoryList;
+  final bool isPast;
 }
 
 class _ChronometerPageState extends State<ChronometerPage>
     with SingleTickerProviderStateMixin {
-  TotalTimeModel? model;
+  final DateTime now = DateTime.now();
 
-  List<TotalTimeModel> saveTimeList = [];
+  TimerHistoryPage? historyPage;
+
+  List<TimeModel> timeList = [];
+  List<HistoryModel> historyList = [];
   bool paused = true;
-  bool tek = false;
 
   Timer? _timer;
   int second = 0;
@@ -37,7 +39,7 @@ class _ChronometerPageState extends State<ChronometerPage>
   @override
   void initState() {
     super.initState();
-    saveTimeList = widget.historyModel?.totalTimeModel ?? [];
+
     controller = AnimationController(
       vsync: this,
       reverseDuration: const Duration(milliseconds: 200),
@@ -64,6 +66,7 @@ class _ChronometerPageState extends State<ChronometerPage>
         }
       },
     );
+    init();
   }
 
   startTimer() {
@@ -72,11 +75,23 @@ class _ChronometerPageState extends State<ChronometerPage>
     });
   }
 
+  init() async {
+    historyList = await TimerViewModel().getTime(historyList);
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
 
     super.dispose();
+  }
+
+  String dateFormatter() {
+    var month = DateTime.now().month;
+    var day = DateTime.now().day;
+    var year = DateTime.now().year;
+    return "$day/$month/$year";
   }
 
   @override
@@ -89,20 +104,17 @@ class _ChronometerPageState extends State<ChronometerPage>
       floatingActionButton: CustomFloatingActionButton(
         buttonName: "Kaydet",
         timerFunction: () async {
-          saveTimeList.add(TotalTimeModel(
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const TimerHistoryPage()));
+
+          timeList.add(TimeModel(
               totalsecond: second, totalminute: minute, totalhour: hour));
-          final historyModel = widget.historyModel != null
-              ? widget.historyModel?.copyWith(
-                  id: widget.historyModel?.id,
-                  day: widget.historyModel?.day,
-                  totalTimeModel: saveTimeList)
-              : HistoryModel(
-                  id: 1,
-                  day: DateTime.now().toString(),
-                  totalTimeModel: saveTimeList);
-          if (historyModel != null) {
-            await TimerViewModel().setTime(historyModel);
-          }
+          historyList.add(HistoryModel(
+              id: timeList.length, day: dateFormatter(), past: timeList));
+
+          TimerViewModel().setTime(historyList);
           setState(() {});
         },
       ),
@@ -175,33 +187,18 @@ class _ChronometerPageState extends State<ChronometerPage>
             const SizedBox(
               width: 50,
             ),
-            Expanded(
+            const Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    ...List.generate(saveTimeList.length, (index) {
-                      return Column(
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 100),
-                            child: ListTile(
-                              leading: Text((index + 1).toString()),
-                              title: Text(
-                                  " ${saveTimeList[index].totalhour.toString()}  :   ${saveTimeList[index].totalminute.toString()} , ${saveTimeList[index].totalsecond.toString()}"),
-                            ),
-                          ),
-                          Divider(
-                            color: Colors.teal.shade900,
-                            height: 1,
-                            endIndent: 50,
-                            indent: 50,
-                            thickness: 1,
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                    const SizedBox(
+                    // ...historyList.map((e) => ListTile(
+                    //       leading: Text(e.id.toString()),
+                    //       title: Text(e.day.toString()),
+                    //       subtitle: Text(
+                    //           // TODO sorun: first değil [index] olmalı
+                    //           "${e.past?.first.totalhour.toString() ?? ""} : ${e.past?.first.totalminute.toString() ?? ""} : ${e.past?.first.totalsecond.toString() ?? ""}"),
+                    //     )),
+                    SizedBox(
                       height: 120,
                     ),
                   ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:future_basic_examples/page/chronometer/timer_history_list_page/model/timer_history_model.dart';
-import 'package:lottie/lottie.dart';
 
 import '../chronometer_page/chronometer_model_view.dart';
 import '../chronometer_page/chronometer_page.dart';
@@ -13,83 +12,79 @@ class TimerHistoryPage extends StatefulWidget {
 }
 
 class _TimerHistoryPageState extends State<TimerHistoryPage> {
-  List<HistoryModel>? historyModel;
-  final TimerViewModel _timerViewModel = TimerViewModel();
+  List<HistoryModel> historyList = [];
+
   @override
   void initState() {
     init();
+
     super.initState();
   }
 
   init() async {
-    historyModel = await _timerViewModel.getTime();
+    historyList = await TimerViewModel().getTime(historyList);
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const ChronometerPage()));
-        },
-        child: const Icon(Icons.add),
-      ),
-      backgroundColor: const Color.fromARGB(255, 9, 110, 88),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            leading: LottieBuilder.asset(
-              "assets/lottie/watch_lottie.json",
-              repeat: false,
-            ),
-            centerTitle: true,
-            backgroundColor: const Color.fromARGB(255, 9, 110, 88),
-            expandedHeight: 90,
-            pinned: true,
-            floating: true,
-            flexibleSpace: const FlexibleSpaceBar(
-              title: Padding(
-                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                child: Text(
-                  "Tur Geçmişi",
-                ),
-              ),
-            ),
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: const Color.fromARGB(255, 9, 110, 88),
+          title: const Text(
+            "Zamanlama Geçmişi",
+            style: TextStyle(color: Colors.white),
           ),
-          SliverList(
-              delegate: SliverChildBuilderDelegate(
-                  childCount: historyModel?.length ?? 0,
-                  (BuildContext context, int index) {
-            final item = historyModel?[index];
-            return ListTile(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChronometerPage(
-                              historyModel: item,
-                            )));
-              },
-              leading: Text(
-                item?.id.toString() ?? "",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Colors.white),
-              ),
-              title: Text(
-                item?.day ?? "null",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Colors.white),
-              ),
-            );
-          }))
-        ],
-      ),
-    );
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChronometerPage(
+                          isPast: false,
+                          pasthistoryList: HistoryModel(),
+                        )));
+          },
+          child: const Icon(Icons.add),
+        ),
+        backgroundColor: const Color.fromARGB(255, 9, 110, 88),
+        body: Column(
+          children: [
+            ...historyList.map((e) => Column(
+                  children: [
+                    ListTile(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChronometerPage(
+                                      isPast: true,
+                                      pasthistoryList: HistoryModel(),
+                                    )));
+                      },
+                      leading: Text(
+                        e.id.toString(),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(e.day.toString(),
+                          style: const TextStyle(color: Colors.white)),
+                      title: Text(
+                          "${e.past?.first.totalhour} : ${e.past?.first.totalminute} : ${e.past?.first.totalsecond}",
+                          style: const TextStyle(color: Colors.white)),
+                      trailing: const Icon(
+                        Icons.navigate_next_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const Divider(
+                      height: 1,
+                      thickness: 1,
+                    )
+                  ],
+                ))
+          ],
+        ));
   }
 }
