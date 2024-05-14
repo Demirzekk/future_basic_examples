@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:future_basic_examples/page/chronometer/timer_history_list_page/model/timer_history_model.dart';
 import 'package:future_basic_examples/page/chronometer/timer_history_list_page/timer_history.dart';
 
@@ -11,7 +12,8 @@ import '../timer_history_list_page/model/total_timer_model.dart';
 import 'chronometer_model_view.dart';
 
 class ChronometerPage extends StatefulWidget {
-  const ChronometerPage({super.key, required this.pasthistoryList, required this.isPast});
+  const ChronometerPage(
+      {super.key, required this.pasthistoryList, required this.isPast});
 
   @override
   State<ChronometerPage> createState() => _ChronometerPageState();
@@ -27,6 +29,9 @@ class _ChronometerPageState extends State<ChronometerPage>
 
   List<TimeModel> timeList = [];
   List<HistoryModel> historyList = [];
+
+  asd() {}
+
   bool paused = true;
 
   Timer? _timer;
@@ -77,6 +82,7 @@ class _ChronometerPageState extends State<ChronometerPage>
 
   init() async {
     historyList = await TimerViewModel().getTime(historyList);
+
     setState(() {});
   }
 
@@ -115,6 +121,7 @@ class _ChronometerPageState extends State<ChronometerPage>
               id: timeList.length, day: dateFormatter(), past: timeList));
 
           TimerViewModel().setTime(historyList);
+
           setState(() {});
         },
       ),
@@ -133,7 +140,10 @@ class _ChronometerPageState extends State<ChronometerPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CustomContainerTime(time: hour),
+                  CustomContainerTime(
+                      time: widget.isPast == true
+                          ? widget.pasthistoryList.past?.first.totalhour ?? 10
+                          : hour),
                   Text(
                     ":",
                     style: Theme.of(context)
@@ -141,7 +151,10 @@ class _ChronometerPageState extends State<ChronometerPage>
                         .bodyLarge
                         ?.copyWith(fontSize: 30),
                   ),
-                  CustomContainerTime(time: minute),
+                  CustomContainerTime(
+                      time: widget.isPast == true
+                          ? widget.pasthistoryList.past?.first.totalminute ?? 10
+                          : minute),
                   Text(
                     ":",
                     style: Theme.of(context)
@@ -149,7 +162,10 @@ class _ChronometerPageState extends State<ChronometerPage>
                         .bodyLarge
                         ?.copyWith(fontSize: 30),
                   ),
-                  CustomContainerTime(time: second)
+                  CustomContainerTime(
+                      time: widget.isPast == true
+                          ? widget.pasthistoryList.past?.first.totalsecond ?? 10
+                          : second)
                 ],
               ),
             ),
@@ -187,20 +203,20 @@ class _ChronometerPageState extends State<ChronometerPage>
             const SizedBox(
               width: 50,
             ),
-            const Expanded(
+            Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // ...historyList.map((e) => ListTile(
-                    //       leading: Text(e.id.toString()),
-                    //       title: Text(e.day.toString()),
-                    //       subtitle: Text(
-                    //           // TODO sorun: first değil [index] olmalı
-                    //           "${e.past?.first.totalhour.toString() ?? ""} : ${e.past?.first.totalminute.toString() ?? ""} : ${e.past?.first.totalsecond.toString() ?? ""}"),
-                    //     )),
-                    SizedBox(
+                    const SizedBox(
                       height: 120,
                     ),
+                    TextButton(
+                        onPressed: () {
+                          timeList.clear();
+                          historyList.clear();
+                          setState(() {});
+                        },
+                        child: const Text("sil"))
                   ],
                 ),
               ),

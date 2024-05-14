@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
 
 import 'total_timer_model.dart';
@@ -32,4 +33,16 @@ class HistoryModel {
 
   @override
   String toString() => 'HistoryModel(id: $id, day: $day, past: $past)';
+
+  HistoryModel copyWith({
+    int? id,
+    String? day,
+    List<TimeModel>? past,
+  }) {
+    return HistoryModel(
+      id: id ?? this.id,
+      day: day ?? this.day,
+      past: past ?? this.past,
+    );
+  }
 }
