@@ -1,9 +1,7 @@
-import 'dart:developer';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:future_basic_examples/page/chronometer/timer_history_list_page/model/timer_history_model.dart';
+import 'package:future_basic_examples/page/chronometer/timer_history_list_page/timer_history_view_model.dart';
 
 import '../chronometer_page/chronometer_model_view.dart';
 import '../chronometer_page/chronometer_page.dart';
@@ -17,7 +15,7 @@ class TimerHistoryPage extends StatefulWidget {
 
 class _TimerHistoryPageState extends State<TimerHistoryPage> {
   List<HistoryModel> historyList = [];
-  // TODOS Copywith metoduy kullanılabilir.
+  List<Pastmap> thatDayList = [];
 
   @override
   void initState() {
@@ -28,8 +26,6 @@ class _TimerHistoryPageState extends State<TimerHistoryPage> {
 
   init() async {
     historyList = await TimerViewModel().getTime(historyList);
-
-    log(historyList.length.toString());
 
     setState(() {});
   }
@@ -45,53 +41,71 @@ class _TimerHistoryPageState extends State<TimerHistoryPage> {
             style: TextStyle(color: Colors.white),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChronometerPage(
-                          isPast: false,
-                          pasthistoryList: HistoryModel(),
-                        )));
-          },
-          child: const Icon(Icons.add),
+        floatingActionButton: SizedBox(
+          height: 50,
+          width: 150,
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChronometerPage(
+                            pastMap: Pastmap(hour: 0, second: 0, minute: 0),
+                            isPast: false,
+                          )));
+            },
+            child: const Text("zaman ekle"),
+          ),
         ),
         backgroundColor: const Color.fromARGB(255, 9, 110, 88),
         body: SingleChildScrollView(
           child: Column(
             children: [
               SizedBox(
-                height: 500,
+                height: 750,
                 width: 500,
                 child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: historyList.length,
                     itemBuilder: (context, index) {
-                      var tek = historyList[index];
+                      var histListIndex = historyList[index];
 
                       return Column(
                         children: [
                           ListTile(
                             onTap: () {
-                              Navigator.push(
+                              TimerHistoryViewModel().thatDay(
+                                  histListIndex.day ?? "",
+                                  historyList,
+                                  thatDayList);
+
+                              Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ChronometerPage(
-                                          isPast: true,
-                                          pasthistoryList: HistoryModel(
-                                              day: historyList[index].day,
-                                              id: historyList[index].id,
-                                              past: historyList[index].past))));
+                                            pastMap: Pastmap(
+                                                hour: historyList[index]
+                                                    .pastmap
+                                                    ?.hour,
+                                                minute: historyList[index]
+                                                    .pastmap
+                                                    ?.minute,
+                                                second: historyList[index]
+                                                    .pastmap
+                                                    ?.second),
+                                            isSavePast: thatDayList,
+                                            isPast: true,
+                                          )));
                             },
                             leading: Text(
-                              tek.id.toString(),
+                              histListIndex.id.toString(),
                               style: const TextStyle(color: Colors.white),
                             ),
-                            subtitle: Text(tek.day.toString(),
+                            subtitle: Text(histListIndex.day.toString(),
                                 style: const TextStyle(color: Colors.white)),
                             title: Text(
-                                "${tek.past?[index].totalhour} : ${tek.past?[index].totalminute} : ${tek.past?[index].totalsecond}",
+                                "${histListIndex.pastmap?.hour} : ${histListIndex.pastmap?.minute} : ${histListIndex.pastmap?.second}",
                                 style: const TextStyle(color: Colors.white)),
                             trailing: const Icon(
                               Icons.navigate_next_outlined,

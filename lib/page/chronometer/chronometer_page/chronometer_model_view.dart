@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:future_basic_examples/page/chronometer/timer_history_list_page/model/timer_history_model.dart';
 
+
 import '../../../init/cache_data/shared_data.dart';
 
 class TimerViewModel {
@@ -20,8 +21,8 @@ class TimerViewModel {
         res?.map((e) => HistoryModel.fromJson(jsonDecode(e ?? ""))).toList() ??
             [];
 
-   
-
     return timeModelListName;
   }
 }
+
+

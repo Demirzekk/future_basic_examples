@@ -8,7 +8,11 @@ class CustomFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-        onPressed: timerFunction, child: Text(buttonName));
+    return SizedBox(
+      height: 50,
+      width: 150,
+      child: FloatingActionButton(
+          onPressed: timerFunction, child: Text(buttonName)),
+    );
   }
 }
