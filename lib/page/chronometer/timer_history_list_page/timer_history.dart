@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:future_basic_examples/page/chronometer/timer_history_list_page/model/timer_history_model.dart';
-import 'package:lottie/lottie.dart';
+import 'package:future_basic_examples/page/chronometer/timer_history_list_page/timer_history_view_model.dart';
 
 import '../chronometer_page/chronometer_model_view.dart';
 import '../chronometer_page/chronometer_page.dart';
@@ -13,83 +14,114 @@ class TimerHistoryPage extends StatefulWidget {
 }
 
 class _TimerHistoryPageState extends State<TimerHistoryPage> {
-  List<HistoryModel>? historyModel;
-  final TimerViewModel _timerViewModel = TimerViewModel();
+  List<HistoryModel> historyList = [];
+  List<Pastmap> thatDayList = [];
+
   @override
   void initState() {
     init();
+
     super.initState();
   }
 
   init() async {
-    historyModel = await _timerViewModel.getTime();
+    historyList = await TimerViewModel().getTime(historyList);
+
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const ChronometerPage()));
-        },
-        child: const Icon(Icons.add),
-      ),
-      backgroundColor: const Color.fromARGB(255, 9, 110, 88),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            leading: LottieBuilder.asset(
-              "assets/lottie/watch_lottie.json",
-              repeat: false,
-            ),
-            centerTitle: true,
-            backgroundColor: const Color.fromARGB(255, 9, 110, 88),
-            expandedHeight: 90,
-            pinned: true,
-            floating: true,
-            flexibleSpace: const FlexibleSpaceBar(
-              title: Padding(
-                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                child: Text(
-                  "Tur Geçmişi",
-                ),
-              ),
-            ),
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: const Color.fromARGB(255, 9, 110, 88),
+          title: const Text(
+            "Zamanlama Geçmişi",
+            style: TextStyle(color: Colors.white),
           ),
-          SliverList(
-              delegate: SliverChildBuilderDelegate(
-                  childCount: historyModel?.length ?? 0,
-                  (BuildContext context, int index) {
-            final item = historyModel?[index];
-            return ListTile(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChronometerPage(
-                              historyModel: item,
-                            )));
-              },
-              leading: Text(
-                item?.id.toString() ?? "",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Colors.white),
-              ),
-              title: Text(
-                item?.day ?? "null",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Colors.white),
-              ),
-            );
-          }))
-        ],
-      ),
-    );
+        ),
+        floatingActionButton: SizedBox(
+          height: 50,
+          width: 150,
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChronometerPage(
+                            pastMap: Pastmap(hour: 0, second: 0, minute: 0),
+                            isPast: false,
+                          )));
+            },
+            child: const Text("zaman ekle"),
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 9, 110, 88),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 750,
+                width: 500,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: historyList.length,
+                    itemBuilder: (context, index) {
+                      var histListIndex = historyList[index];
+
+                      return Column(
+                        children: [
+                          ListTile(
+                            onTap: () {
+                              TimerHistoryViewModel().thatDay(
+                                  histListIndex.day ?? "",
+                                  historyList,
+                                  thatDayList);
+
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChronometerPage(
+                                            pastMap: Pastmap(
+                                                hour: historyList[index]
+                                                    .pastmap
+                                                    ?.hour,
+                                                minute: historyList[index]
+                                                    .pastmap
+                                                    ?.minute,
+                                                second: historyList[index]
+                                                    .pastmap
+                                                    ?.second),
+                                            isSavePast: thatDayList,
+                                            isPast: true,
+                                          )));
+                            },
+                            leading: Text(
+                              histListIndex.id.toString(),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            subtitle: Text(histListIndex.day.toString(),
+                                style: const TextStyle(color: Colors.white)),
+                            title: Text(
+                                "${histListIndex.pastmap?.hour} : ${histListIndex.pastmap?.minute} : ${histListIndex.pastmap?.second}",
+                                style: const TextStyle(color: Colors.white)),
+                            trailing: const Icon(
+                              Icons.navigate_next_outlined,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                          )
+                        ],
+                      );
+                    }),
+              )
+            ],
+          ),
+        ));
   }
 }
